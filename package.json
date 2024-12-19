@@ -1,8 +1,8 @@
 {
-  "name": "transcribe",
+  "name": "simple-groq-transcriber",
   "version": "1.0.0",
   "type": "module",
-  "description": "Audio transcription service using Groq API",
+  "description": "Simple audio transcription app using the Groq API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
