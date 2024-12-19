@@ -238,16 +238,37 @@ async function sendToGroq(file) {
   }
 }
 
+// Function to handle copy button state changes
+function updateCopyButtonState(success = true) {
+  const originalText = 'Copy to Clipboard';
+  const successText = 'Copied to Clipboard!';
+  
+  if (success) {
+    copyBtn.textContent = successText;
+    copyBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+    copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+      copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+      copyBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+    }, 2000);
+  }
+}
+
 function copyToClipboard(str) {
   navigator.clipboard.writeText(str).then(() => {
     console.log('Copied to clipboard');
+    updateCopyButtonState(true);
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    updateCopyButtonState(false);
   });
 }
 
 copyBtn.addEventListener('click', () => {
   const text = transcriptionResult.textContent;
   copyToClipboard(text);
-  alert('Copied transcription to clipboard!');
 });
 
 deleteAllBtn.addEventListener('click', () => {
