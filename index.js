@@ -15,7 +15,7 @@ const deleteAllBtn = document.getElementById('deleteAllBtn');
 const waveformCanvas = document.getElementById('waveform');
 const canvasCtx = waveformCanvas.getContext('2d');
 const waveformContainer = document.querySelector('.waveform-container');
-
+const historySection = document.getElementById('historySection');
 let transcriptionHistory = JSON.parse(localStorage.getItem('transcriptionHistory') || '[]');
 
 // Waveform audio analysis nodes
@@ -36,6 +36,12 @@ if (storedModel) {
 }
 
 function updateHistoryUI() {
+  if (transcriptionHistory.length === 0) {
+    historySection.classList.add('hidden');
+  } else {
+    historySection.classList.remove('hidden');
+  }
+
   historyList.innerHTML = '';
   // Reverse chronological order (most recent first)
   for (let i = transcriptionHistory.length - 1; i >= 0; i--) {
