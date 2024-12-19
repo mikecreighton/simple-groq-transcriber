@@ -13,54 +13,72 @@
     border: 1px solid #cbd5e1;
     border-radius: 0.375rem;
   }
+  .waveform-container {
+    display: none;
+  }
+  .waveform-container.recording {
+    display: block;
+  }
 </style>
 </head>
-<body class="bg-gray-100 text-gray-900 p-4">
-  <div class="max-w-xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">Simple Groq Transcriber</h1>
+<body class="bg-gray-100 text-gray-900 p-6">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">Simple Groq Transcriber</h1>
     
-    <div class="mb-4">
-      <label for="apiKey" class="block font-semibold mb-1">Groq API Key:</label>
-      <input id="apiKey" type="password" class="w-full border border-gray-300 p-2 rounded" placeholder="Enter your Groq API key"/>
-      <button id="saveApiKeyBtn" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save API Key</button>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <!-- Left Column: Recording and Transcription -->
+      <div class="space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+          <div class="flex items-center gap-4 mb-6">
+            <button id="recordBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">Record</button>
+            <span class="text-sm text-gray-600">Press <strong>Spacebar</strong> to toggle start/stop</span>
+          </div>
+
+          <!-- Waveform - Only visible when recording -->
+          <div class="waveform-container mb-6">
+            <canvas id="waveform" class="rounded-lg"></canvas>
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-2">Current Transcription:</label>
+            <div id="transcriptionResult" class="border border-gray-200 p-4 rounded-lg bg-gray-50 min-h-[120px] whitespace-pre-wrap mb-3"></div>
+            <button id="copyBtn" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800">Copy to Clipboard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Settings -->
+      <div class="bg-white p-6 rounded-lg shadow-sm space-y-6">
+        <div>
+          <label for="apiKey" class="block font-medium text-gray-700 mb-2">Groq API Key:</label>
+          <input id="apiKey" type="password" class="w-full border border-gray-300 p-2 rounded-lg" placeholder="Enter your Groq API key"/>
+          <button id="saveApiKeyBtn" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save API Key</button>
+        </div>
+
+        <div>
+          <label for="audioDevices" class="block font-medium text-gray-700 mb-2">Audio Input Device:</label>
+          <select id="audioDevices" class="w-full border border-gray-300 p-2 rounded-lg bg-white"></select>
+        </div>
+
+        <div>
+          <label for="modelSelect" class="block font-medium text-gray-700 mb-2">Transcription Model:</label>
+          <select id="modelSelect" class="w-full border border-gray-300 p-2 rounded-lg bg-white">
+            <option value="distil-whisper-large-v3-en" selected>distil-whisper-large-v3-en (default)</option>
+            <option value="whisper-large-v3-turbo">whisper-large-v3-turbo</option>
+            <option value="whisper-large-v3">whisper-large-v3</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div class="mb-4">
-      <label for="audioDevices" class="block font-semibold mb-1">Select Audio Input Device:</label>
-      <select id="audioDevices" class="w-full border border-gray-300 p-2 rounded"></select>
+    <!-- Full-width History Section -->
+    <div class="bg-white p-6 rounded-lg shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Past Transcriptions</h2>
+        <button id="deleteAllBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete All</button>
+      </div>
+      <div id="historyList" class="space-y-3"></div>
     </div>
-
-    <div class="mb-4">
-      <label for="modelSelect" class="block font-semibold mb-1">Select Transcription Model:</label>
-      <select id="modelSelect" class="w-full border border-gray-300 p-2 rounded">
-        <option value="distil-whisper-large-v3-en" selected>distil-whisper-large-v3-en (default)</option>
-        <option value="whisper-large-v3-turbo">whisper-large-v3-turbo</option>
-        <option value="whisper-large-v3">whisper-large-v3</option>
-      </select>
-    </div>
-
-    <div class="flex items-center mb-4">
-      <button id="recordBtn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 mr-4">Record</button>
-      <span class="text-sm text-gray-600">Press <strong>Spacebar</strong> to toggle start/stop</span>
-    </div>
-
-    <!-- Waveform Canvas -->
-    <div class="mb-4">
-      <label class="block font-semibold mb-1">Waveform Visualizer:</label>
-      <canvas id="waveform"></canvas>
-    </div>
-
-    <div class="mb-4">
-      <label class="block font-semibold mb-1">Transcription Result:</label>
-      <div id="transcriptionResult" class="border border-gray-300 p-2 rounded bg-white min-h-[100px] whitespace-pre-wrap"></div>
-      <button id="copyBtn" class="mt-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Copy to Clipboard</button>
-    </div>
-
-    <h2 class="text-xl font-semibold mb-2 flex items-center justify-between">
-      <span>Past Transcriptions</span>
-      <button id="deleteAllBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Delete All</button>
-    </h2>
-    <div id="historyList" class="space-y-4 mb-4"></div>
   </div>
 
 <script src="index.js" type="module"></script>

@@ -14,6 +14,7 @@ const modelSelect = document.getElementById('modelSelect');
 const deleteAllBtn = document.getElementById('deleteAllBtn');
 const waveformCanvas = document.getElementById('waveform');
 const canvasCtx = waveformCanvas.getContext('2d');
+const waveformContainer = document.querySelector('.waveform-container');
 
 let transcriptionHistory = JSON.parse(localStorage.getItem('transcriptionHistory') || '[]');
 
@@ -148,6 +149,7 @@ async function startRecording() {
     const file = new File([blob], "audio.webm", { type: "audio/webm" });
     await sendToGroq(file);
     stopVisualizer();
+    waveformContainer.classList.remove('recording');
   };
 
   mediaRecorder.start();
@@ -156,8 +158,12 @@ async function startRecording() {
   recordBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
   recordBtn.classList.add('bg-red-600', 'hover:bg-red-700');
 
-  // Set up audio visualization
-  startVisualizer(stream);
+  // Show waveform container and start visualizer
+  waveformContainer.classList.add('recording');
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    startVisualizer(stream);
+  });
 }
 
 function stopRecording() {
@@ -280,46 +286,57 @@ deleteAllBtn.addEventListener('click', () => {
 });
 
 function startVisualizer(stream) {
-  audioContext = new AudioContext();
-  const source = audioContext.createMediaStreamSource(stream);
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  // Create analyzer node
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 2048;
   const bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
+
+  // Connect audio nodes
+  const source = audioContext.createMediaStreamSource(stream);
   source.connect(analyser);
 
-  drawWaveform();
+  // Start animation
+  function draw() {
+    animationId = requestAnimationFrame(draw);
+    drawWaveform();
+  }
+  draw();
 }
 
 function drawWaveform() {
-  animationId = requestAnimationFrame(drawWaveform);
-  analyser.getByteTimeDomainData(dataArray);
-
   const width = waveformCanvas.width;
   const height = waveformCanvas.height;
-  canvasCtx.clearRect(0, 0, width, height);
-
-  canvasCtx.strokeStyle = '#1d4ed8'; // Tailwind blue-700
+  
+  analyser.getByteTimeDomainData(dataArray);
+  
+  canvasCtx.fillStyle = '#f8fafc';
+  canvasCtx.fillRect(0, 0, width, height);
+  
   canvasCtx.lineWidth = 2;
+  canvasCtx.strokeStyle = '#22c55e';
   canvasCtx.beginPath();
-
-  let sliceWidth = width * 1.0 / dataArray.length;
+  
+  const sliceWidth = width / dataArray.length;
   let x = 0;
-
+  
   for (let i = 0; i < dataArray.length; i++) {
-    let v = dataArray[i] / 128.0;
-    let y = v * height/2;
-
+    const v = dataArray[i] / 128.0;
+    const y = (v * height) / 2;
+    
     if (i === 0) {
       canvasCtx.moveTo(x, y);
     } else {
       canvasCtx.lineTo(x, y);
     }
-
     x += sliceWidth;
   }
-
-  canvasCtx.lineTo(width, height/2);
+  
+  canvasCtx.lineTo(width, height / 2);
   canvasCtx.stroke();
 }
 
@@ -327,6 +344,7 @@ function stopVisualizer() {
   cancelAnimationFrame(animationId);
   if (audioContext) {
     audioContext.close().catch(err => console.error(err));
+    audioContext = null;
   }
   // Clear the waveform
   canvasCtx.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
