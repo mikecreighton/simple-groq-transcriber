@@ -46,6 +46,14 @@ http://localhost:3000
 - You can select the Whisper model you want to use.
 - You can select the microphone you want to use.
 
+## Usage
+
+- Just hit the spacebar to start recording.
+- Hit the spacebar again to stop recording.
+- The transcription will be displayed in the "Current Transcription" section.
+- The transcription will be automatically copied to your clipboard.
+- A history of your transcriptions will be displayed in the "History" section, saved to the browser's local storage.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -58,4 +66,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Groq for providing the AI models
 - GPT-o1 for [the initial draft of the code](https://chatgpt.com/share/676489b5-efa0-8012-a490-3351616b7867)
-- Claude 3.5 Sonnet for helping with this README
+- Cursor (with Claude 3.5 Sonnet) for helping with this README and final touches
