@@ -95,22 +95,38 @@ saveApiKeyBtn.addEventListener('click', () => {
 // Enumerate audio devices
 async function getAudioDevices() {
   try {
-    await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Request microphone permissions and get a stream
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    // Enumerate devices
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const audioInputs = devices.filter(d => d.kind === 'audioinput');
+
+    // Clear the dropdown
+    audioDevicesSelect.innerHTML = '';
+
+    // Populate the dropdown and auto-select the default device
+    audioInputs.forEach((device, index) => {
+      const option = document.createElement('option');
+      option.value = device.deviceId;
+      option.textContent = device.label || `Microphone ${index + 1}`;
+      audioDevicesSelect.appendChild(option);
+
+      // Select this option if it's the default device
+      if (device.deviceId === "default") {
+        option.selected = true;
+      }
+    });
+
+    // Stop the stream to release the microphone
+    stream.getTracks().forEach(track => track.stop());
   } catch (err) {
-    console.error('Microphone permission denied:', err);
-    // user may have denied permission
+    console.error('Error fetching audio devices or microphone permissions denied:', err);
+    return;
   }
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  const audioInputs = devices.filter(d => d.kind === 'audioinput');
-  audioDevicesSelect.innerHTML = '';
-  audioInputs.forEach(device => {
-    const option = document.createElement('option');
-    option.value = device.deviceId;
-    option.textContent = device.label || `Microphone ${audioDevicesSelect.length + 1}`;
-    audioDevicesSelect.appendChild(option);
-  });
 }
 
+// Call the function to initialize the dropdown
 getAudioDevices();
 
 async function startRecording() {
