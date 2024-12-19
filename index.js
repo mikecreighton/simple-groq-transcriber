@@ -43,7 +43,7 @@ function updateHistoryUI() {
     const text = transcriptionHistory[i];
 
     const container = document.createElement('div');
-    container.className = 'bg-white border border-gray-300 rounded p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4';
+    container.className = 'bg-zinc-800 border border-zinc-700 rounded p-4 flex flex-col sm:flex-row items-start justify-between space-y-4 sm:space-y-0 sm:space-x-4';
 
     const textSpan = document.createElement('span');
     textSpan.className = 'flex-1 whitespace-pre-wrap break-words';
@@ -53,17 +53,15 @@ function updateHistoryUI() {
     btnGroup.className = 'flex items-center space-x-2';
 
     const copyItemBtn = document.createElement('button');
-    copyItemBtn.className = 'px-2 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700';
-    copyItemBtn.textContent = 'Copy';
+    copyItemBtn.className = 'px-2 py-2 bg-gray-600 text-white text-xs rounded-lg hover:bg-gray-700';
+    copyItemBtn.innerHTML = '<i data-lucide="clipboard" class="w-4 h-4"></i>';
     copyItemBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard!');
-      });
+      navigator.clipboard.writeText(text)
     });
 
     const deleteItemBtn = document.createElement('button');
-    deleteItemBtn.className = 'px-2 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700';
-    deleteItemBtn.textContent = 'Delete';
+    deleteItemBtn.className = 'px-2 py-2 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700';
+    deleteItemBtn.innerHTML = '<i data-lucide="trash" class="w-4 h-4"></i>';
     deleteItemBtn.addEventListener('click', () => {
       // Delete this item from transcriptionHistory
       transcriptionHistory.splice(i, 1);
@@ -79,6 +77,7 @@ function updateHistoryUI() {
 
     historyList.appendChild(container);
   }
+  lucide.createIcons();
 }
 
 updateHistoryUI();
@@ -314,11 +313,11 @@ function drawWaveform() {
   
   analyser.getByteTimeDomainData(dataArray);
   
-  canvasCtx.fillStyle = '#f8fafc';
+  canvasCtx.fillStyle = '#27272a';
   canvasCtx.fillRect(0, 0, width, height);
   
-  canvasCtx.lineWidth = 2;
-  canvasCtx.strokeStyle = '#22c55e';
+  canvasCtx.lineWidth = 1;
+  canvasCtx.strokeStyle = '#a1a1aa';
   canvasCtx.beginPath();
   
   const sliceWidth = width / dataArray.length;
