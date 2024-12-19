@@ -29,6 +29,12 @@ if (storedApiKey) {
   apiKeyInput.value = storedApiKey;
 }
 
+// Add near the top with other localStorage loading
+const storedModel = localStorage.getItem('selectedModel');
+if (storedModel) {
+  modelSelect.value = storedModel;
+}
+
 function updateHistoryUI() {
   historyList.innerHTML = '';
   // Reverse chronological order (most recent first)
@@ -297,3 +303,8 @@ function resizeCanvas() {
 
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
+
+// Add this event listener after other event listeners
+modelSelect.addEventListener('change', () => {
+  localStorage.setItem('selectedModel', modelSelect.value);
+});
