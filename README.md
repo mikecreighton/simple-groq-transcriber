@@ -1,6 +1,6 @@
 # Simple Groq Transcriber
 
-Simple Groq Transcriber is a tool that leverages Groq's API to transcribe audio recordings into text. It provides fast and accurate transcriptions while being easy to use.
+Simple Groq Transcriber is a tool that leverages Groq's API to transcribe audio recordings into text. It provides fast and accurate transcriptions while being easy to use. This is a no-frills tool that just works.
 
 ## Features
 
@@ -11,7 +11,7 @@ Simple Groq Transcriber is a tool that leverages Groq's API to transcribe audio 
 
 ## Prerequisites
 
-- GroqCloud API key
+- [GroqCloud API key](https://console.groq.com/keys) (available for free as of 12/19/2024)
 
 ## Installation
 
@@ -59,6 +59,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Groq for providing the AI models
+- [Groq](https://groq.com/) for providing the AI models and super fast speeds
 - GPT-o1 for [the initial draft of the code](https://chatgpt.com/share/676489b5-efa0-8012-a490-3351616b7867)
-- Cursor (with Claude 3.5 Sonnet) for helping with this README and final touches
+- [Cursor](https://www.cursor.com/) (with Claude 3.5 Sonnet) for helping with this README and final touches
