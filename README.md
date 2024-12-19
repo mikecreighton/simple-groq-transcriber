@@ -1,9 +1,5 @@
 # Simple Groq Transcriber
 
-A simple and efficient audio transcription tool powered by the GroqCloud API, using OpenAI Whisper models.
-
-## Overview
-
 Simple Groq Transcriber is a tool that leverages Groq's API to transcribe audio recordings into text. It provides fast and accurate transcriptions while being easy to use.
 
 ## Features
