@@ -10,7 +10,7 @@ Simple Groq Transcriber is a tool that leverages Groq's API to transcribe audio 
 
 - Fast audio transcription using Whisper models
 - Simple web interface with a focus on ease of use (keyboard-driven UX)
-- Everything runs in the browser, all data saved to the browser's local storage
+- All data saved to the browser's local storage
 - High accuracy transcription results
 
 ## Prerequisites
