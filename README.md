@@ -46,8 +46,7 @@ http://localhost:3000
 
 - Just hit the spacebar to start recording.
 - Hit the spacebar again to stop recording.
-- The transcription will be displayed in the "Current Transcription" section.
-- The transcription will be automatically copied to your clipboard.
+- The transcription will be displayed in the "Current Transcription" section and automatically copied to your clipboard.
 - A history of your transcriptions will be displayed in the "History" section, saved to the browser's local storage.
 
 ## Contributing
