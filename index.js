@@ -30,7 +30,6 @@ if (storedApiKey) {
   apiKeyInput.value = storedApiKey;
 }
 
-// Add near the top with other localStorage loading
 const storedModel = localStorage.getItem('selectedModel');
 if (storedModel) {
   modelSelect.value = storedModel;
@@ -358,7 +357,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Add this event listener after other event listeners
+// Save selected model to localStorage when user changes it
 modelSelect.addEventListener('change', () => {
   localStorage.setItem('selectedModel', modelSelect.value);
 });
