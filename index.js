@@ -2,6 +2,16 @@
 let mediaRecorder = null;
 let chunks = [];
 let isRecording = false;
+let recordingStartTime = null;
+
+const MAX_RECORDING_MINUTES = 20;
+const RECORDING_TIMEOUT_MS = MAX_RECORDING_MINUTES * 60 * 1000;
+let recordingTimer = null;
+let timerDisplay = document.createElement('div');
+timerDisplay.className = 'text-sm text-zinc-500 mt-2';
+
+const fileExtension = '.webm';
+const fileMimeType = 'audio/webm';
 
 const apiKeyInput = document.getElementById('apiKey');
 const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
@@ -134,6 +144,25 @@ async function getAudioDevices() {
 // Call the function to initialize the dropdown
 getAudioDevices();
 
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  const maxRecordingMinutesText = `<span class="text-zinc-600">(Maximum: ${MAX_RECORDING_MINUTES} minutes)</span>`;
+  let assembledOutput = '';
+  if (minutes === 0) {
+    assembledOutput = `${remainingSeconds} seconds ${maxRecordingMinutesText}`;
+  } else {
+    assembledOutput = `${minutes}:${remainingSeconds.toString().padStart(2, '0')} ${maxRecordingMinutesText}`;
+  }
+  return `Recording Time: ${assembledOutput}`;
+}
+
+function updateTimerDisplay() {
+  if (!recordingStartTime) return;
+  const elapsedSeconds = (Date.now() - recordingStartTime) / 1000;
+  timerDisplay.innerHTML = formatTime(elapsedSeconds);
+}
+
 async function startRecording() {
   const deviceId = audioDevicesSelect.value;
   const constraints = {
@@ -149,15 +178,38 @@ async function startRecording() {
     chunks.push(e.data);
   };
   mediaRecorder.onstop = async () => {
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    const file = new File([blob], "audio.webm", { type: "audio/webm" });
+    const blob = new Blob(chunks, { type: fileMimeType });
+    const file = new File([blob], "audio" + fileExtension, { type: fileMimeType });
+
+    // const fileSizeInBits = blob.size * 8;
+    // const recordingDurationInSeconds = (Date.now() - recordingStartTime) / 1000;
+    // const bitrateKbps = (fileSizeInBits / recordingDurationInSeconds) / 1000;
+    // console.log(`Recording duration: ${recordingDurationInSeconds.toFixed(2)} seconds`);
+    // console.log(`Estimated bitrate: ${bitrateKbps.toFixed(2)} kbps`);
+    // console.log(`File size: ${blob.size} bytes`);
+    
     await sendToGroq(file);
     stopVisualizer();
     waveformContainer.classList.remove('recording');
   };
 
   mediaRecorder.start();
+  recordingStartTime = Date.now();
   isRecording = true;
+  timerDisplay.innerHTML = `Starting Recording...`;
+  
+  // Start the timer display
+  waveformContainer.appendChild(timerDisplay);
+  recordingTimer = setInterval(updateTimerDisplay, 1000);
+  
+  // Set timeout to stop recording after MAX_RECORDING_MINUTES
+  setTimeout(() => {
+    if (isRecording) {
+      console.log(`Recording stopped after ${MAX_RECORDING_MINUTES} minutes`);
+      stopRecording();
+    }
+  }, RECORDING_TIMEOUT_MS);
+
   recordBtn.textContent = 'Stop';
   recordBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
   recordBtn.classList.add('bg-red-600', 'hover:bg-red-700');
@@ -177,6 +229,15 @@ function stopRecording() {
     recordBtn.textContent = 'Record';
     recordBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
     recordBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    
+    // Clear the timer
+    if (recordingTimer) {
+      clearInterval(recordingTimer);
+      recordingTimer = null;
+    }
+    if (timerDisplay.parentNode === waveformContainer) {
+      waveformContainer.removeChild(timerDisplay);
+    }
   }
 }
 
@@ -209,7 +270,8 @@ async function sendToGroq(file) {
   
   const model = modelSelect.value;
   const formData = new FormData();
-  formData.append('audio', file, 'audio.webm');
+  formData.append('audio', file, 'audio' + fileExtension);
+  formData.append('fileExtension', fileExtension);
   formData.append('apiKey', apiKey);
   formData.append('model', model);
 
@@ -251,17 +313,18 @@ async function sendToGroq(file) {
 // Function to handle copy button state changes
 function updateCopyButtonState(success = true) {
   const originalText = 'Copy to Clipboard';
-  const successText = 'Copied to Clipboard!';
+  const successText = '<i data-lucide="circle-check-big" class="relative top-[-2px] w-4 mr-2 h-4 inline-block"></i> Copied to Clipboard!';
   
   if (success) {
-    copyBtn.textContent = successText;
-    copyBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+    copyBtn.innerHTML = successText;
+    copyBtn.classList.remove('bg-zinc-700', 'hover:bg-zinc-800');
     copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    lucide.createIcons();
     
     setTimeout(() => {
-      copyBtn.textContent = originalText;
+      copyBtn.innerHTML = originalText;
       copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-      copyBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+      copyBtn.classList.add('bg-zinc-700', 'hover:bg-zinc-800');
     }, 2000);
   }
 }

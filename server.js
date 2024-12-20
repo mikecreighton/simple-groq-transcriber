@@ -30,12 +30,12 @@ const upload = multer({
 });
 
 app.post('/transcribe', upload.single('audio'), async (req, res) => {
-  const { apiKey, model } = req.body;
+  const { apiKey, model, fileExtension } = req.body;
   let audioPath = req.file.path;
 
   try {
-    // Rename the file to have a .webm extension if it doesn't have one
-    const newPath = audioPath + '.webm';
+    // Rename the file to have the appropriate extension if it doesn't have one.
+    const newPath = audioPath + fileExtension;
     await rename(audioPath, newPath);
     audioPath = newPath;
 
