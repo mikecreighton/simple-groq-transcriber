@@ -65,10 +65,18 @@
         <div>
           <label for="modelSelect" class="block font-medium mb-2">Transcription Model:</label>
           <select id="modelSelect" class="w-full border border-zinc-700 p-4 rounded-lg bg-zinc-800">
-            <option value="distil-whisper-large-v3-en" selected>distil-whisper-large-v3-en (default)</option>
-            <option value="whisper-large-v3-turbo">whisper-large-v3-turbo</option>
+            <option value="whisper-large-v3-turbo" selected>whisper-large-v3-turbo (default)</option>
             <option value="whisper-large-v3">whisper-large-v3</option>
+            <option value="distil-whisper-large-v3-en">distil-whisper-large-v3-en</option>
           </select>
+        </div>
+
+        <div>
+          <label for="prompt" class="block font-medium mb-2">Prompt:</label>
+          <p class="text-sm text-zinc-500 mb-2">Provide context or specify how to spell unfamiliar words (limited to 224 tokens)</p>
+          <div class="flex flex-row gap-4 align-middle">
+            <input id="prompt" type="text" class="w-full p-4 border border-zinc-700 rounded-lg bg-zinc-800"/>
+          </div>
         </div>
       </div>
     </div>

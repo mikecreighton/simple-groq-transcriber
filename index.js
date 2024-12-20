@@ -26,6 +26,7 @@ const waveformCanvas = document.getElementById('waveform');
 const canvasCtx = waveformCanvas.getContext('2d');
 const waveformContainer = document.querySelector('.waveform-container');
 const historySection = document.getElementById('historySection');
+const promptInput = document.getElementById('prompt');
 let transcriptionHistory = JSON.parse(localStorage.getItem('transcriptionHistory') || '[]');
 
 // Waveform audio analysis nodes
@@ -164,6 +165,8 @@ function updateTimerDisplay() {
 }
 
 async function startRecording() {
+  transcriptionResult.textContent = '';
+  
   const deviceId = audioDevicesSelect.value;
   const constraints = {
     audio: deviceId ? { deviceId: { exact: deviceId } } : true,
@@ -251,6 +254,11 @@ recordBtn.addEventListener('click', () => {
 
 // Spacebar to toggle recording
 document.addEventListener('keydown', (e) => {
+  // Skip if user is focused in the prompt input
+  if (document.activeElement === promptInput) {
+    return;
+  }
+
   if (e.code === 'Space') {
     e.preventDefault();
     if (isRecording) {
@@ -274,7 +282,9 @@ async function sendToGroq(file) {
   formData.append('fileExtension', fileExtension);
   formData.append('apiKey', apiKey);
   formData.append('model', model);
-
+  if (promptInput.value.trim() !== "") {
+    formData.append('prompt', promptInput.value.trim());
+  }
   transcriptionResult.textContent = 'Transcribing...';
 
   try {

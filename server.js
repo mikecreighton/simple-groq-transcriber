@@ -30,7 +30,7 @@ const upload = multer({
 });
 
 app.post('/transcribe', upload.single('audio'), async (req, res) => {
-  const { apiKey, model, fileExtension } = req.body;
+  const { apiKey, model, fileExtension, prompt } = req.body;
   let audioPath = req.file.path;
 
   try {
@@ -41,10 +41,14 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
 
     // Initialize Groq client and send request
     const groq = new Groq({apiKey: apiKey});
-    const transcription = await groq.audio.transcriptions.create({
+    let options = {
       file: createReadStream(audioPath),
-      model: model || 'distil-whisper-large-v3-en'
-    });
+      model: model || 'whisper-large-v3-turbo',
+    };
+    if (prompt !== "") {
+      options.prompt = prompt;
+    }
+    const transcription = await groq.audio.transcriptions.create(options);
     
     // Send response to client
     res.json(transcription);
